@@ -1,0 +1,10 @@
+<input
+  #element
+  type="text"
+  [value]="displayValue"
+  (keydown)="onKeyDown($event)"
+  (change)="onChange($event)"
+  (focus)="onFocus($event)"
+  (blur)="onBlur($event)"
+  (input)="onChange($event)"
+>
