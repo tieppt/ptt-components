@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { InputMaskModule } from 'projects/input-mask/src/public-api';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -12,6 +13,7 @@ import { InputMaskModule } from 'projects/input-mask/src/public-api';
   imports: [
     BrowserModule,
     InputMaskModule,
+    FormsModule,
     AppRoutingModule
   ],
   providers: [],

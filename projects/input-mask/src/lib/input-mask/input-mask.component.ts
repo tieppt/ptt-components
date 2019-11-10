@@ -5,8 +5,11 @@ import {
   OnChanges,
   ViewChild,
   ElementRef,
+  Output,
+  EventEmitter,
+  SimpleChanges,
 } from '@angular/core';
-import { ControlValueAccessor } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import * as NumeralFormatter from 'cleave.js/src/shortcuts/NumeralFormatter';
 import * as DateFormatter from 'cleave.js/src/shortcuts/DateFormatter';
 import * as TimeFormatter from 'cleave.js/src/shortcuts/TimeFormatter';
@@ -15,19 +18,36 @@ import * as CreditCardDetector from 'cleave.js/src/shortcuts/CreditCardDetector'
 import * as Util from 'cleave.js/src/utils/Util';
 import * as DefaultProperties from 'cleave.js/src/common/DefaultProperties';
 import { BACKSPACE } from '../keycodes';
+import { CleaveOptions } from 'cleave.js/options';
+
+interface IPttOnChange {
+  rawValue: any;
+  value: any;
+}
 
 @Component({
   selector: 'ptt-input-mask',
   templateUrl: './input-mask.component.html',
-  styleUrls: ['./input-mask.component.scss']
+  styleUrls: ['./input-mask.component.scss'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: InputMaskComponent,
+      multi: true
+    }
+  ]
 })
 export class InputMaskComponent
   implements OnInit, OnChanges, ControlValueAccessor {
   @Input() value: any;
+  @Input() placeholder: string;
+  @Input() options: CleaveOptions = {};
 
-  @Input() options: {
-    [key: string]: any;
-  } = {};
+  @Output() pttOnFocus = new EventEmitter();
+  @Output() pttOnBlur = new EventEmitter();
+  @Output() pttOnKeyDown = new EventEmitter();
+  @Output() pttOnChange = new EventEmitter<IPttOnChange>();
+  @Output() valueChange = new EventEmitter();
 
   @ViewChild('element', { static: true }) element: ElementRef<HTMLInputElement>;
 
@@ -36,7 +56,7 @@ export class InputMaskComponent
   isFocus = false;
 
   // internal props
-  properties: {
+  properties: CleaveOptions & {
     [key: string]: any;
   } = {};
   isAndroid = false;
@@ -44,22 +64,32 @@ export class InputMaskComponent
   cursorPosition = 0;
   lastInputValue: any;
   rawValue: any;
+  // CVA
+  isDisabled = false;
+  private cvaOnChange = (v: any) => {};
+  private cvaOnTouched = (v: any) => {};
 
   constructor() {}
 
   ngOnInit() {
-    this.init();
-    console.log(this);
+    // this.init();
+    // console.log(this);
   }
 
-  ngOnChanges() {
-    this.properties = DefaultProperties.assign(
-      {},
-      {
-        ...this.options,
-        initValue: this.value
-      }
-    );
+  ngOnChanges(changes: SimpleChanges) {
+    if ('options' in changes || 'value' in changes) {
+      this.properties = DefaultProperties.assign(
+        {},
+        {
+          ...this.options,
+          initValue: this.value
+        }
+      );
+      this.init();
+    }
+    if ('placeholder' in changes || this.placeholder == null) {
+      this.placeholder = '';
+    }
   }
 
   setRawValue(value: any) {
@@ -73,14 +103,9 @@ export class InputMaskComponent
 
     pps.postDelimiterBackspace = false;
 
-    // this.onChange({
-    //   target: { value },
-
-    //   // Methods to better resemble a SyntheticEvent
-    //   stopPropagation: Util.noop,
-    //   preventDefault: Util.noop,
-    //   persist: Util.noop
-    // });
+    this.onChange({
+      target: { value },
+    });
   }
 
   getRawValue(): any {
@@ -149,6 +174,7 @@ export class InputMaskComponent
     }
 
     // .onKeyDown(event);
+    this.pttOnKeyDown.emit(event);
   }
 
   onFocus(event: any) {
@@ -162,6 +188,7 @@ export class InputMaskComponent
     this.rawValue = rawValue;
 
     // .onFocus(event);
+    this.pttOnFocus.emit(event);
 
     Util.fixPrefixCursor(
       this.element.nativeElement,
@@ -180,6 +207,8 @@ export class InputMaskComponent
     event.target.value = pps.result;
 
     this.rawValue = rawValue;
+    this.pttOnBlur.emit(event);
+    this.cvaOnTouched(true);
 
     // .registeredEvents.onBlur(event);
   }
@@ -192,10 +221,17 @@ export class InputMaskComponent
     const rawValue = this.getRawValue();
     event.target.rawValue = rawValue;
     event.target.value = pps.result;
+    this.displayValue = pps.result;
 
     this.rawValue = rawValue;
 
     // .onChange(event);
+    this.valueChange.emit(rawValue);
+    this.pttOnChange.emit({
+      rawValue,
+      value: this.displayValue,
+    });
+    this.cvaOnChange(rawValue);
   }
   // #end DOM event
 
@@ -488,15 +524,16 @@ export class InputMaskComponent
 
   // ControlValueAccessor
   writeValue(obj: any): void {
-    // throw new Error('Method not implemented.');
+    this.value = obj;
+    this.setRawValue(this.value);
   }
   registerOnChange(fn: any): void {
-    // throw new Error('Method not implemented.');
+    this.cvaOnChange = fn;
   }
   registerOnTouched(fn: any): void {
-    // throw new Error('Method not implemented.');
+    this.cvaOnTouched = fn;
   }
   setDisabledState?(isDisabled: boolean): void {
-    // throw new Error('Method not implemented.');
+    this.isDisabled = isDisabled;
   }
 }

@@ -1,6 +1,8 @@
 <input
   #element
   type="text"
+  [placeholder]="placeholder"
+  [disabled]="isDisabled"
   [value]="displayValue"
   (keydown)="onKeyDown($event)"
   (change)="onChange($event)"

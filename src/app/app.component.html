@@ -1,5 +1,9 @@
-<ptt-input-mask [value]="3000" [options]="{
+<ptt-input-mask [(ngModel)]="value" [options]="{
   numeral: true,
   numeralThousandsGroupStyle: 'thousand'
 }">
 </ptt-input-mask>
+
+<pre>
+  {{ value }}
+</pre>
