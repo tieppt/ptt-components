@@ -5,7 +5,6 @@ import {
   OnChanges,
   ViewChild,
   ElementRef,
-  AfterViewChecked
 } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import * as NumeralFormatter from 'cleave.js/src/shortcuts/NumeralFormatter';
@@ -15,7 +14,7 @@ import * as PhoneFormatter from 'cleave.js/src/shortcuts/PhoneFormatter';
 import * as CreditCardDetector from 'cleave.js/src/shortcuts/CreditCardDetector';
 import * as Util from 'cleave.js/src/utils/Util';
 import * as DefaultProperties from 'cleave.js/src/common/DefaultProperties';
-import { LEFT_ARROW, RIGHT_ARROW, BACKSPACE } from '../keycodes';
+import { BACKSPACE } from '../keycodes';
 
 @Component({
   selector: 'ptt-input-mask',
@@ -23,7 +22,7 @@ import { LEFT_ARROW, RIGHT_ARROW, BACKSPACE } from '../keycodes';
   styleUrls: ['./input-mask.component.scss']
 })
 export class InputMaskComponent
-  implements OnInit, OnChanges, AfterViewChecked, ControlValueAccessor {
+  implements OnInit, OnChanges, ControlValueAccessor {
   @Input() value: any;
 
   @Input() options: {
@@ -42,7 +41,7 @@ export class InputMaskComponent
   } = {};
   isAndroid = false;
   hasBackspaceSupport = true;
-  // cursorPosition = 0;
+  cursorPosition = 0;
   lastInputValue: any;
   rawValue: any;
 
@@ -61,15 +60,6 @@ export class InputMaskComponent
         initValue: this.value
       }
     );
-  }
-
-  ngAfterViewChecked() {
-    // TODO: handle cursorPosition
-    // const pps = this.properties;
-    // const element = this.element.nativeElement;
-    // if (element && this.isFocus) {
-    //   Util.setSelection(element, this.cursorPosition, pps.document);
-    // }
   }
 
   setRawValue(value: any) {
@@ -157,16 +147,6 @@ export class InputMaskComponent
     } else {
       pps.postDelimiterBackspace = false;
     }
-
-    // TODO: handle cursorPosition
-    // if (charCode === LEFT_ARROW) {
-    //   this.cursorPosition--;
-    //   if (this.cursorPosition < 0) {
-    //     this.cursorPosition = 0;
-    //   }
-    // } else if (charCode === RIGHT_ARROW) {
-    //   this.cursorPosition++;
-    // }
 
     // .onKeyDown(event);
   }
@@ -361,7 +341,8 @@ export class InputMaskComponent
       window.setTimeout(() => {
         this.displayValue = newValue;
         // TODO: handle cursorPosition
-        // this.cursorPosition = endPos;
+        this.cursorPosition = endPos;
+        setTimeout(() => this.setCursorPosition());
       }, 1);
 
       return;
@@ -369,7 +350,8 @@ export class InputMaskComponent
 
     this.displayValue = newValue;
     // TODO: handle cursorPosition
-    // this.cursorPosition = endPos;
+    this.cursorPosition = endPos;
+    setTimeout(() => this.setCursorPosition());
   }
   updateCreditCardPropsByValue(value: any) {
     const pps = this.properties;
@@ -494,6 +476,14 @@ export class InputMaskComponent
       pps.signBeforePrefix,
       pps.delimiter
     );
+  }
+
+  private setCursorPosition() {
+    const pps = this.properties;
+    const element = this.element.nativeElement;
+    if (element && this.isFocus) {
+      Util.setSelection(element, this.cursorPosition, pps.document);
+    }
   }
 
   // ControlValueAccessor
