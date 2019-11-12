@@ -8,6 +8,7 @@ import {
   Output,
   EventEmitter,
   SimpleChanges,
+  Renderer2,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import * as NumeralFormatter from 'cleave.js/src/shortcuts/NumeralFormatter';
@@ -66,14 +67,12 @@ export class InputMaskComponent
   rawValue: any;
   // CVA
   isDisabled = false;
-  private cvaOnChange = (v: any) => {};
-  private cvaOnTouched = (v: any) => {};
+  private cvaOnChange = (v: any) => { };
+  private cvaOnTouched = (v: any) => { };
 
-  constructor() {}
+  constructor(private renderer: Renderer2) { }
 
   ngOnInit() {
-    // this.init();
-    // console.log(this);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -103,9 +102,7 @@ export class InputMaskComponent
 
     pps.postDelimiterBackspace = false;
 
-    this.onChange({
-      target: { value },
-    });
+    this.processValueChange(value);
   }
 
   getRawValue(): any {
@@ -173,21 +170,19 @@ export class InputMaskComponent
       pps.postDelimiterBackspace = false;
     }
 
-    // .onKeyDown(event);
     this.pttOnKeyDown.emit(event);
   }
 
-  onFocus(event: any) {
+  onFocus(event: FocusEvent) {
     this.isFocus = true;
     const pps = this.properties;
 
     const rawValue = this.getRawValue();
-    event.target.rawValue = rawValue;
-    event.target.value = pps.result;
+    const element = this.element.nativeElement;
+    this.renderer.setProperty(element, 'rawValue', rawValue);
+    this.renderer.setValue(element, pps.result);
 
     this.rawValue = rawValue;
-
-    // .onFocus(event);
     this.pttOnFocus.emit(event);
 
     Util.fixPrefixCursor(
@@ -203,36 +198,21 @@ export class InputMaskComponent
     const pps = this.properties;
 
     const rawValue = this.getRawValue();
-    event.target.rawValue = rawValue;
-    event.target.value = pps.result;
+    const element = this.element.nativeElement;
+    this.renderer.setProperty(element, 'rawValue', rawValue);
+    this.renderer.setValue(element, pps.result);
 
     this.rawValue = rawValue;
     this.pttOnBlur.emit(event);
     this.cvaOnTouched(true);
-
-    // .registeredEvents.onBlur(event);
   }
 
-  onChange(event: any) {
-    const pps = this.properties;
+  onChange(event: Event) {
+    const element = this.element.nativeElement;
 
-    this.formatInput(event.target.value);
-
-    const rawValue = this.getRawValue();
-    event.target.rawValue = rawValue;
-    event.target.value = pps.result;
-    this.displayValue = pps.result;
-
-    this.rawValue = rawValue;
-
-    // .onChange(event);
-    this.valueChange.emit(rawValue);
-    this.pttOnChange.emit({
-      rawValue,
-      value: this.displayValue,
-    });
-    this.cvaOnChange(rawValue);
+    this.processValueChange(element.value);
   }
+
   // #end DOM event
 
   formatInput(value: any, fromProps = false) {
@@ -520,6 +500,25 @@ export class InputMaskComponent
     if (element && this.isFocus) {
       Util.setSelection(element, this.cursorPosition, pps.document);
     }
+  }
+
+  private processValueChange(value: any) {
+    const element = this.element.nativeElement;
+    const pps = this.properties;
+    this.formatInput(value);
+
+    const rawValue = this.getRawValue();
+    this.renderer.setProperty(element, 'rawValue', rawValue);
+    this.renderer.setProperty(element, 'value', pps.result);
+    this.displayValue = pps.result;
+    this.rawValue = rawValue;
+
+    this.valueChange.emit(rawValue);
+    this.pttOnChange.emit({
+      rawValue,
+      value: this.displayValue,
+    });
+    this.cvaOnChange(rawValue);
   }
 
   // ControlValueAccessor
