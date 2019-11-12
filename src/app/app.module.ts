@@ -3,8 +3,8 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { InputMaskModule } from 'projects/input-mask/src/public-api';
 import { FormsModule } from '@angular/forms';
+import { InputMaskModule } from '@phtt/input-mask';
 
 @NgModule({
   declarations: [

@@ -1,13 +1,18 @@
 {
-  "name": "input-mask",
-  "version": "0.0.1",
+  "name": "@phtt/input-mask",
+  "version": "1.0.1",
   "dependencies": {
-    "cleave.js": "^1.5.3"
+    "cleave.js": "~1.5.3"
+  },
+  "license": "MIT",
+  "private": false,
+  "config": {
+    "access": "public"
   },
   "peerDependencies": {
-    "@angular/common": "^9.0.0-rc.1",
-    "@angular/core": "^9.0.0-rc.1",
-    "@angular/forms": "^9.0.0-rc.1",
+    "@angular/common": ">=6.0.0 <10.0.0",
+    "@angular/core": ">=6.0.0 <10.0.0",
+    "@angular/forms": ">=6.0.0 <10.0.0",
     "tslib": "^1.10.0"
   }
 }

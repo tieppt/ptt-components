@@ -2,6 +2,19 @@
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/input-mask",
   "lib": {
-    "entryFile": "src/public-api.ts"
-  }
+    "entryFile": "src/public-api.ts",
+    "umdModuleIds": {
+      "cleave.js": "Cleave",
+      "cleave.js/src/shortcuts/NumeralFormatter": "cleave.js/src/shortcuts/NumeralFormatter",
+      "cleave.js/src/shortcuts/DateFormatter": "cleave.js/src/shortcuts/DateFormatter",
+      "cleave.js/src/shortcuts/TimeFormatter": "cleave.js/src/shortcuts/TimeFormatter",
+      "cleave.js/src/shortcuts/PhoneFormatter": "cleave.js/src/shortcuts/PhoneFormatter",
+      "cleave.js/src/shortcuts/CreditCardDetector": "cleave.js/src/shortcuts/CreditCardDetector",
+      "cleave.js/src/utils/Util": "cleave.js/src/utils/Util",
+      "cleave.js/src/common/DefaultProperties": "cleave.js/src/common/DefaultProperties"
+    }
+  },
+  "whitelistedNonPeerDependencies": [
+    "cleave.js"
+  ]
 }

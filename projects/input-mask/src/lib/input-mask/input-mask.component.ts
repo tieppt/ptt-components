@@ -11,15 +11,11 @@ import {
   Renderer2,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import * as NumeralFormatter from 'cleave.js/src/shortcuts/NumeralFormatter';
-import * as DateFormatter from 'cleave.js/src/shortcuts/DateFormatter';
-import * as TimeFormatter from 'cleave.js/src/shortcuts/TimeFormatter';
-import * as PhoneFormatter from 'cleave.js/src/shortcuts/PhoneFormatter';
-import * as CreditCardDetector from 'cleave.js/src/shortcuts/CreditCardDetector';
-import * as Util from 'cleave.js/src/utils/Util';
-import * as DefaultProperties from 'cleave.js/src/common/DefaultProperties';
+import Cleave from 'cleave.js';
 import { BACKSPACE } from '../keycodes';
-import { CleaveOptions } from 'cleave.js/options';
+import { CleaveOptions } from '../options';
+
+const { NumeralFormatter, DateFormatter, TimeFormatter, PhoneFormatter, CreditCardDetector, Util, DefaultProperties } = Cleave;
 
 interface IPttOnChange {
   rawValue: any;
