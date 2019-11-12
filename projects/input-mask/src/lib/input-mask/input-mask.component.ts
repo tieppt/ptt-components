@@ -180,7 +180,7 @@ export class InputMaskComponent
     const rawValue = this.getRawValue();
     const element = this.element.nativeElement;
     this.renderer.setProperty(element, 'rawValue', rawValue);
-    this.renderer.setValue(element, pps.result);
+    this.renderer.setProperty(element, 'value', pps.result);
 
     this.rawValue = rawValue;
     this.pttOnFocus.emit(event);
@@ -200,7 +200,7 @@ export class InputMaskComponent
     const rawValue = this.getRawValue();
     const element = this.element.nativeElement;
     this.renderer.setProperty(element, 'rawValue', rawValue);
-    this.renderer.setValue(element, pps.result);
+    this.renderer.setProperty(element, 'value', pps.result);
 
     this.rawValue = rawValue;
     this.pttOnBlur.emit(event);
